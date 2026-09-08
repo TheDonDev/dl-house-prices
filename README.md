@@ -20,17 +20,18 @@ This project uses a **PyTorch Neural Network** to predict California housing pri
 - **FastAPI** for predictions
 - **Streamlit** for interactive dashboard
 
-## 📁 Structure                                                                                                                                 [dl-house-prices/
+## 📁 Structure
+```
+dl-house-prices/
 ├── src/
-│ └── model.py # Neural Network definition
+│   └── model.py                 # Neural Network definition
 ├── deployment/
-│ ├── app.py # FastAPI
-│ └── dashboard.py # Streamlit
-├── models/ # Saved models
-├── train.py # Training script
+│   ├── app.py                   # FastAPI
+│   └── dashboard.py             # Streamlit
+├── models/                       # Saved models
+├── train.py                      # Training script
 └── requirements.txt
-text
-
+```
 
 ## 🔧 Run
 ```bash
@@ -42,4 +43,4 @@ uvicorn deployment.app:app --host 0.0.0.0 --port 8000
 
 # Dashboard
 streamlit run deployment/dashboard.py
-
+```

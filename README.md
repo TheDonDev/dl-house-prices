@@ -20,7 +20,7 @@ This project uses a **PyTorch Neural Network** to predict California housing pri
 - **FastAPI** for predictions
 - **Streamlit** for interactive dashboard
 
-## 📁 Structure                                                                 [200~dl-house-prices/
+## 📁 Structure                                                                                                                                 [dl-house-prices/
 ├── src/
 │ └── model.py # Neural Network definition
 ├── deployment/

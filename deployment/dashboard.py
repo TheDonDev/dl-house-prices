@@ -1,5 +1,5 @@
 """
-Streamlit Dashboard for Neural Network House Price Prediction
+Streamlit Dashboard for Nairobi House Price Prediction
 """
 import streamlit as st
 import requests
@@ -7,17 +7,17 @@ import pandas as pd
 import plotly.express as px
 
 st.set_page_config(
-    page_title="Neural Network - House Price Predictor",
-    page_icon="🧠",
+    page_title="Nairobi House Price Predictor",
+    page_icon="🏠",
     layout="wide"
 )
 
-st.title("🧠 Neural Network House Price Predictor")
+st.title("🏠 Nairobi House Price Predictor")
 st.markdown("**Model:** PyTorch Neural Network | **R² Score:** 0.8344")
 
 # Sidebar inputs
 st.sidebar.header("📊 Input Features")
-st.sidebar.markdown("Adjust the sliders to predict house prices")
+st.sidebar.markdown("Adjust the sliders to predict Nairobi house prices")
 
 med_inc = st.sidebar.slider("Median Income", 0.0, 15.0, 3.5, 0.1)
 house_age = st.sidebar.slider("House Age (years)", 0.0, 50.0, 20.0, 1.0)
@@ -40,35 +40,35 @@ if st.sidebar.button("🔮 Predict Price", type="primary", use_container_width=T
         "Latitude": latitude,
         "Longitude": longitude
     }
-    
+
     try:
         response = requests.post("http://localhost:8000/predict", json=data)
         if response.status_code == 200:
             result = response.json()
-            
+
             col1, col2, col3 = st.columns(3)
-            
+
             with col1:
                 st.metric(
                     "🏠 Predicted Price",
                     f"${result['prediction']:.2f}K",
                     delta="Neural Network Prediction"
                 )
-            
+
             with col2:
                 st.metric(
                     "📈 Model R²",
                     "0.8344",
                     delta="+0.0082 vs XGBoost"
                 )
-            
+
             with col3:
                 st.metric(
                     "🎯 Accuracy",
                     "± $0.46K",
                     delta="Average Error"
                 )
-            
+
             # Show input summary
             st.subheader("📊 Input Features")
             df_input = pd.DataFrame([data])
@@ -91,7 +91,7 @@ with col1:
     - Hidden Layer 2: 32 neurons (ReLU + Dropout)
     - Hidden Layer 3: 16 neurons (ReLU + Dropout)
     - Output Layer: 1 neuron
-    
+
     **Total Parameters:** 3,201
     """)
 
@@ -102,7 +102,7 @@ with col2:
     - RMSE: **$0.46K**
     - Training Loss: 0.0955
     - Test Loss: 0.1040
-    
+
     **🏆 This model beats XGBoost!**
     """)
 
@@ -130,7 +130,7 @@ fig = px.bar(
     x="Importance",
     y="Feature",
     orientation='h',
-    title="Feature Influence on Neural Network Predictions",
+    title="Feature Influence on Nairobi House Price Predictions",
     color="Importance",
     color_continuous_scale="Reds",
     height=400

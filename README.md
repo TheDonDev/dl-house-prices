@@ -1,5 +1,8 @@
 # 🧠 House Price Prediction - Neural Network
 
+## Project Description
+This project is a machine learning application for predicting California housing prices using a neural network built with PyTorch. It combines data preprocessing, model training, and deployment into a simple end-to-end workflow for evaluating price trends and comparing model performance.
+
 ## Overview
 This project uses a **PyTorch Neural Network** to predict California housing prices.
 

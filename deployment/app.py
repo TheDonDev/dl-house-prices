@@ -1,77 +1,74 @@
 """
-FastAPI for Nairobi House Price Prediction
+FastAPI for Nairobi property price prediction.
 """
-from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel
-import torch
-import torch.nn as nn
+from pathlib import Path
+import os
+import sys
+
 import joblib
 import numpy as np
-from pathlib import Path
-import sys
-import os
+import torch
+from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from src.model import HousePriceNN
 
 app = FastAPI(
-    title="Nairobi House Price Prediction - Neural Network",
-    description="Predict Nairobi housing prices using a Neural Network",
+    title="Nairobi Property Price Prediction - Neural Network",
+    description="Predict Nairobi property prices using a Neural Network",
     version="2.0.0"
 )
 
-# Load model
-model = HousePriceNN()
-model_path = Path(__file__).parent.parent / 'models' / 'model.pth'
-model.load_state_dict(torch.load(model_path, map_location='cpu'))
+model = HousePriceNN(input_size=4)
+model_path = Path(__file__).parent.parent / "models" / "model.pth"
+model.load_state_dict(torch.load(model_path, map_location="cpu"))
 model.eval()
 
-# Load scaler
-scaler_path = Path(__file__).parent.parent / 'models' / 'scaler.pkl'
+imputer_path = Path(__file__).parent.parent / "models" / "imputer.pkl"
+scaler_path = Path(__file__).parent.parent / "models" / "scaler.pkl"
+imputer = joblib.load(imputer_path)
 scaler = joblib.load(scaler_path)
 
-FEATURE_NAMES = ['MedInc', 'HouseAge', 'AveRooms', 'AveBedrms',
-                 'Population', 'AveOccup', 'Latitude', 'Longitude']
+FEATURE_NAMES = ["bedrooms", "bathrooms", "house_size_m2", "land_size_acres"]
 
 
-class HouseFeatures(BaseModel):
-    MedInc: float
-    HouseAge: float
-    AveRooms: float
-    AveBedrms: float
-    Population: float
-    AveOccup: float
-    Latitude: float
-    Longitude: float
+class PropertyFeatures(BaseModel):
+    bedrooms: float
+    bathrooms: float
+    house_size_m2: float
+    land_size_acres: float
 
 
 @app.get("/")
 def root():
     return {
-        "message": "🏠 Nairobi House Price Prediction - Neural Network",
+        "message": "🏠 Nairobi Property Price Prediction - Neural Network",
         "model": "Neural Network (PyTorch)",
         "features": FEATURE_NAMES
     }
 
 
 @app.post("/predict")
-def predict(features: HouseFeatures):
+def predict(features: PropertyFeatures):
     try:
-        X = np.array([[
-            features.MedInc, features.HouseAge, features.AveRooms,
-            features.AveBedrms, features.Population, features.AveOccup,
-            features.Latitude, features.Longitude
-        ]])
+        values = np.array([[
+            features.bedrooms,
+            features.bathrooms,
+            features.house_size_m2,
+            features.land_size_acres,
+        ]], dtype=float)
 
-        X_scaled = scaler.transform(X)
-        X_tensor = torch.tensor(X_scaled, dtype=torch.float32)
+        values_imputed = imputer.transform(values)
+        values_scaled = scaler.transform(values_imputed)
+        X_tensor = torch.tensor(values_scaled, dtype=torch.float32)
 
         with torch.no_grad():
             prediction = model(X_tensor).numpy()[0][0]
 
         return {
             "prediction": float(prediction),
-            "price_k": f"${prediction:.2f}K"
+            "price_ksh": f"KSh {prediction:,.0f}"
         }
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))

@@ -1,23 +1,20 @@
-# 🧠 Nairobi House Price Prediction - Neural Network
+# 🧠 Nairobi Property Price Predictor
 
 ## Project Description
-This project is a machine learning application for predicting Nairobi housing prices using a neural network built with PyTorch. It combines data preprocessing, model training, and deployment into a simple end-to-end workflow for evaluating price trends and comparing model performance.
+This project is a machine learning application for predicting Nairobi property prices using a neural network built with PyTorch. It combines data preprocessing, model training, and deployment into a simple end-to-end workflow for evaluating price trends and comparing model performance.
 
 ## Overview
-This project uses a **PyTorch Neural Network** to predict Nairobi housing prices.
+This project uses a **PyTorch Neural Network** to predict Nairobi property prices from property characteristics such as bedrooms, bathrooms, house size, and land size.
 
 ## 🏆 Results
-- **R² Score:** 0.8344 (Beats XGBoost!)
-- **RMSE:** $0.46K
-- **Architecture:** 8 → 64 → 32 → 16 → 1
+- **R² Score:** Model performance depends on the trained Nairobi dataset.
+- **Architecture:** 4 → 64 → 32 → 16 → 1
 
-## 📊 Model Comparison
-| Model | R² Score |
-|-------|----------|
-| Linear Regression | 0.5758 |
-| Random Forest | 0.7739 |
-| XGBoost | 0.8262 |
-| **Neural Network** | **0.8344** 🏆 |
+## 📊 Model Inputs
+- **Bedrooms**
+- **Bathrooms**
+- **House size (m²)**
+- **Land size (acres)**
 
 ## 🚀 Deployment
 - **FastAPI** for predictions
@@ -25,14 +22,16 @@ This project uses a **PyTorch Neural Network** to predict Nairobi housing prices
 
 ## 📁 Structure
 ```
-dl-house-prices/
+ml-property-prices/
 ├── src/
 │   └── model.py                 # Neural Network definition
 ├── deployment/
 │   ├── app.py                   # FastAPI
 │   └── dashboard.py             # Streamlit
-├── models/                       # Saved models
-├── train.py                      # Training script
+├── models/                      # Saved models
+├── train.py                     # Training script
+├── Nairobi propertyprices - Sheet1.csv  # Nairobi dataset
+├── README.md
 └── requirements.txt
 ```
 

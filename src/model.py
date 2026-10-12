@@ -1,22 +1,21 @@
 """
-Neural Network for Nairobi House Price Prediction using PyTorch
+Neural Network for Nairobi property price prediction using PyTorch.
 """
 import torch
 import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import DataLoader, TensorDataset
-import numpy as np
 
 
 class HousePriceNN(nn.Module):
     """
     Neural Network architecture:
-    - Input: 8 features
+    - Input: configurable feature count
     - Hidden layers: 64 → 32 → 16 neurons
-    - Output: 1 (price prediction)
+    - Output: 1 (property price prediction)
     """
 
-    def __init__(self, input_size=8):
+    def __init__(self, input_size=4):
         super(HousePriceNN, self).__init__()
 
         self.fc1 = nn.Linear(input_size, 64)
@@ -38,18 +37,15 @@ class HousePriceNN(nn.Module):
         return x
 
 
-def train_model(model, train_loader, test_loader, epochs=200, lr=0.001):
-    """
-    Train the neural network
-    """
+def train_model(model, train_loader, test_loader, epochs=250, lr=0.001):
+    """Train the neural network."""
     criterion = nn.MSELoss()
     optimizer = optim.Adam(model.parameters(), lr=lr)
 
-    print("🚀 Training Nairobi House Price Neural Network...")
+    print("🚀 Training Nairobi Property Price Neural Network...")
     print("=" * 50)
 
     for epoch in range(epochs):
-        # Training
         model.train()
         train_loss = 0.0
         for batch_X, batch_y in train_loader:
@@ -62,7 +58,6 @@ def train_model(model, train_loader, test_loader, epochs=200, lr=0.001):
 
         train_loss /= len(train_loader)
 
-        # Testing
         model.eval()
         test_loss = 0.0
         with torch.no_grad():
@@ -72,8 +67,8 @@ def train_model(model, train_loader, test_loader, epochs=200, lr=0.001):
                 test_loss += loss.item()
         test_loss /= len(test_loader)
 
-        if (epoch + 1) % 20 == 0:
-            print(f"Epoch {epoch+1:3}/{epochs} | Train Loss: {train_loss:.4f} | Test Loss: {test_loss:.4f}")
+        if (epoch + 1) % 25 == 0:
+            print(f"Epoch {epoch + 1:3}/{epochs} | Train Loss: {train_loss:.4f} | Test Loss: {test_loss:.4f}")
 
     print("=" * 50)
     print("✅ Training complete!")
@@ -81,7 +76,6 @@ def train_model(model, train_loader, test_loader, epochs=200, lr=0.001):
 
 
 if __name__ == "__main__":
-    # Quick test
-    model = HousePriceNN()
+    model = HousePriceNN(input_size=4)
     print(f"🧠 Model created with {sum(p.numel() for p in model.parameters()):,} parameters")
     print(model)

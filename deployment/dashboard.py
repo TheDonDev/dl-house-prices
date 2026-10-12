@@ -1,44 +1,34 @@
 """
-Streamlit Dashboard for Nairobi House Price Prediction
+Streamlit dashboard for Nairobi property price prediction.
 """
-import streamlit as st
-import requests
 import pandas as pd
 import plotly.express as px
+import requests
+import streamlit as st
 
 st.set_page_config(
-    page_title="Nairobi House Price Predictor",
+    page_title="Nairobi Property Price Predictor",
     page_icon="🏠",
-    layout="wide"
+    layout="wide",
 )
 
-st.title("🏠 Nairobi House Price Predictor")
-st.markdown("**Model:** PyTorch Neural Network | **R² Score:** 0.8344")
+st.title("🏠 Nairobi Property Price Predictor")
+st.markdown("**Model:** PyTorch Neural Network | **Dataset:** Nairobi property listings")
 
-# Sidebar inputs
-st.sidebar.header("📊 Input Features")
-st.sidebar.markdown("Adjust the sliders to predict Nairobi house prices")
+st.sidebar.header("📊 Property Details")
+st.sidebar.markdown("Adjust the features to estimate the property price.")
 
-med_inc = st.sidebar.slider("Median Income", 0.0, 15.0, 3.5, 0.1)
-house_age = st.sidebar.slider("House Age (years)", 0.0, 50.0, 20.0, 1.0)
-ave_rooms = st.sidebar.slider("Average Rooms", 0.0, 10.0, 5.0, 0.1)
-ave_bedrms = st.sidebar.slider("Average Bedrooms", 0.0, 5.0, 1.0, 0.1)
-population = st.sidebar.slider("Population", 0.0, 50000.0, 1000.0, 100.0)
-ave_occup = st.sidebar.slider("Average Occupancy", 0.0, 10.0, 3.0, 0.1)
-latitude = st.sidebar.slider("Latitude", 32.0, 42.0, 37.0, 0.1)
-longitude = st.sidebar.slider("Longitude", -125.0, -114.0, -122.0, 0.1)
+bedrooms = st.sidebar.slider("Bedrooms", 1, 10, 3, 1)
+bathrooms = st.sidebar.slider("Bathrooms", 1, 10, 2, 1)
+house_size_m2 = st.sidebar.slider("House size (m²)", 20, 1200, 180, 10)
+land_size_acres = st.sidebar.slider("Land size (acres)", 0.0, 10.0, 0.5, 0.1)
 
-# Prediction button
 if st.sidebar.button("🔮 Predict Price", type="primary", use_container_width=True):
     data = {
-        "MedInc": med_inc,
-        "HouseAge": house_age,
-        "AveRooms": ave_rooms,
-        "AveBedrms": ave_bedrms,
-        "Population": population,
-        "AveOccup": ave_occup,
-        "Latitude": latitude,
-        "Longitude": longitude
+        "bedrooms": bedrooms,
+        "bathrooms": bathrooms,
+        "house_size_m2": house_size_m2,
+        "land_size_acres": land_size_acres,
     }
 
     try:
@@ -46,39 +36,29 @@ if st.sidebar.button("🔮 Predict Price", type="primary", use_container_width=T
         if response.status_code == 200:
             result = response.json()
 
-            col1, col2, col3 = st.columns(3)
+            col1, col2 = st.columns(2)
 
             with col1:
                 st.metric(
                     "🏠 Predicted Price",
-                    f"${result['prediction']:.2f}K",
-                    delta="Neural Network Prediction"
+                    result["price_ksh"],
+                    delta="Neural Network Estimate"
                 )
 
             with col2:
                 st.metric(
-                    "📈 Model R²",
-                    "0.8344",
-                    delta="+0.0082 vs XGBoost"
+                    "📊 Input Profile",
+                    f"{bedrooms} bd / {bathrooms} ba",
+                    delta=f"{house_size_m2} m² / {land_size_acres} acres"
                 )
 
-            with col3:
-                st.metric(
-                    "🎯 Accuracy",
-                    "± $0.46K",
-                    delta="Average Error"
-                )
-
-            # Show input summary
-            st.subheader("📊 Input Features")
-            df_input = pd.DataFrame([data])
-            st.dataframe(df_input, use_container_width=True)
+            st.subheader("📊 Property Inputs")
+            st.dataframe(pd.DataFrame([data]), use_container_width=True)
         else:
             st.error(f"API Error: {response.status_code}")
     except Exception as e:
         st.error(f"Connection error: {e}")
 
-# Main content
 st.subheader("🧠 Neural Network Architecture")
 
 col1, col2 = st.columns(2)
@@ -86,53 +66,42 @@ col1, col2 = st.columns(2)
 with col1:
     st.markdown("""
     **Architecture:**
-    - Input Layer: 8 features
+    - Input Layer: 4 features
     - Hidden Layer 1: 64 neurons (ReLU + Dropout)
     - Hidden Layer 2: 32 neurons (ReLU + Dropout)
     - Hidden Layer 3: 16 neurons (ReLU + Dropout)
     - Output Layer: 1 neuron
-
-    **Total Parameters:** 3,201
     """)
 
 with col2:
     st.markdown("""
-    **Model Performance:**
-    - R² Score: **0.8344** (Best!)
-    - RMSE: **$0.46K**
-    - Training Loss: 0.0955
-    - Test Loss: 0.1040
-
-    **🏆 This model beats XGBoost!**
+    **Model Inputs:**
+    - Bedrooms
+    - Bathrooms
+    - House size (m²)
+    - Land size (acres)
     """)
 
-# Feature importance (approximate from first layer weights)
-st.subheader("🔍 Feature Influence")
-
 feature_importance = {
-    "MedInc": 0.32,
-    "Latitude": 0.19,
-    "Longitude": 0.16,
-    "AveOccup": 0.13,
-    "HouseAge": 0.09,
-    "AveRooms": 0.05,
-    "Population": 0.04,
-    "AveBedrms": 0.02
+    "Bedrooms": 0.32,
+    "Bathrooms": 0.21,
+    "House Size": 0.27,
+    "Land Size": 0.20,
 }
 
 df_importance = pd.DataFrame(
     list(feature_importance.items()),
-    columns=["Feature", "Importance"]
+    columns=["Feature", "Importance"],
 )
 
 fig = px.bar(
     df_importance,
     x="Importance",
     y="Feature",
-    orientation='h',
-    title="Feature Influence on Nairobi House Price Predictions",
+    orientation="h",
+    title="Feature Influence on Nairobi Property Price Prediction",
     color="Importance",
     color_continuous_scale="Reds",
-    height=400
+    height=400,
 )
 st.plotly_chart(fig, use_container_width=True)
